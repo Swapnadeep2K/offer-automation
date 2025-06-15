@@ -9,6 +9,25 @@ function App() {
   const [intervalSeconds, setIntervalSeconds] = useState(10);
   const [isDarkTheme, setIsDarkTheme] = useState(true); // default dark
 
+  const envOptions = [
+    { label: "OR2 (Oregon, USA)", value: "or2" },
+    { label: "VA6 (Virginia, USA)", value: "va6" },
+    { label: "IRL1 (Ireland)", value: "irl1" },
+    { label: "IND1 (India)", value: "ind1" },
+    { label: "SGP3 (Singapore)", value: "sgp3" },
+    { label: "AUS3 (Australia)", value: "aus3" },
+    { label: "JPN3 (Japan)", value: "jpn3" },
+  ];
+
+  const [selectedEnv, setSelectedEnv] = useState("ind1");
+
+  const versionOptions = [
+    { label: "v1", value: "v1" },
+    { label: "v2", value: "v2" },
+  ];
+
+  const [selectedVersion, setSelectedVersion] = useState("v1");
+
   const configIds = [
     { label: "Development", value: "0fd7f30c-ae2b-4365-9db9-2ef9ed5e1dc6" },
     { label: "Staging", value: "140d9dfa-12d0-4e8e-95fa-99df70030bc8" },
@@ -40,7 +59,7 @@ function App() {
       const payload = JSON.parse(jsonInput);
       const requestId = generateUUID();
 
-      const url = `https://smetrics.wyndhamhotels.com/ee/ind1/v1/interact?configId=${selectedConfigId}&requestId=${requestId}`;
+      const url = `https://smetrics.wyndhamhotels.com/ee/${selectedEnv}/${selectedVersion}/interact?configId=${selectedConfigId}&requestId=${requestId}`;
 
       const response = await fetch(url, {
         method: "POST",
@@ -52,11 +71,11 @@ function App() {
       const value = extractValueFromPath(json, dataPath);
 
       setResponses((prev) => [
-        ...prev,
         {
           timestamp: new Date().toLocaleTimeString(),
           value,
         },
+        ...prev,
       ]);
     } catch (error) {
       console.error("Fetch error:", error);
@@ -204,6 +223,36 @@ function App() {
             {configIds.map((c) => (
               <option key={c.value} value={c.value}>
                 {c.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div style={{ flex: 1 }}>
+          <label style={{ display: "block", marginBottom: 5 }}>Select Environment:</label>
+          <select
+            value={selectedEnv}
+            onChange={(e) => setSelectedEnv(e.target.value)}
+            style={inputStyle}
+          >
+            {envOptions.map((env) => (
+              <option key={env.value} value={env.value}>
+                {env.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div style={{ flex: 1 }}>
+          <label style={{ display: "block", marginBottom: 5 }}>Select API Version:</label>
+          <select
+            value={selectedVersion}
+            onChange={(e) => setSelectedVersion(e.target.value)}
+            style={inputStyle}
+          >
+            {versionOptions.map((v) => (
+              <option key={v.value} value={v.value}>
+                {v.label}
               </option>
             ))}
           </select>
