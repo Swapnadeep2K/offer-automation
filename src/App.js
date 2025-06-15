@@ -1,11 +1,12 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 
 function App() {
   const [jsonInput, setJsonInput] = useState("");
   const [dataPath, setDataPath] = useState("");
   const [responses, setResponses] = useState([]);
   const [isRunning, setIsRunning] = useState(false);
-  const intervalRef = useRef(null);
+  const [intervalId, setIntervalId] = useState(null);
+
   const configIds = [
     { label: "Development", value: "0fd7f30c-ae2b-4365-9db9-2ef9ed5e1dc6" },
     { label: "Staging", value: "140d9dfa-12d0-4e8e-95fa-99df70030bc8" },
@@ -60,21 +61,24 @@ function App() {
     }
   };
 
-
   const startPolling = () => {
-    try {
-      JSON.parse(jsonInput); // Validate JSON first
-      setIsRunning(true);
+    stopPolling(); // just in case
+
+    const id = setInterval(() => {
       fetchData();
-      intervalRef.current = setInterval(fetchData, 10000);
-    } catch {
-      alert("Invalid JSON payload.");
-    }
+    }, 10000);
+
+    setIntervalId(id);
+    setIsRunning(true);
   };
 
   const stopPolling = () => {
-    clearInterval(intervalRef.current);
+    if (intervalId) {
+      clearInterval(intervalId);
+      setIntervalId(null);
+    }
     setIsRunning(false);
+    setResponses([]); // clear table
   };
 
   return (
